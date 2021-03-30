@@ -45,27 +45,23 @@ def image_upsampling_interpolation(image, n):
         for y in range(result.height - n):
             if x % n == 0 and y % n == 0:
                 result.putpixel((x, y), image.getpixel((x // n, y // n)))
+            else:
+                left_upper_color = image.getpixel((x // n, y // n))
+                right_upper_color = image.getpixel((x // n + 1, y // n))
+                t = (x - x // n * n) / ((x // n + 1 - x // n) * n)
 
-            if y % n == 0:
-                x1 = x // n
-                x2 = (x // n) + 1
+                upper_line_color = rgb_lerp(left_upper_color, right_upper_color, t)
 
-                color1 = image.getpixel((x1, y // n))
-                color2 = image.getpixel((x2, y // n))
-                t = (x - x1 * n) / ((x2 - x1) * n)
+                left_lower_color = image.getpixel((x // n, y // n + 1))
+                right_lower_color = image.getpixel((x // n + 1, y // n + 1))
+                t = (x - x // n * n) / ((x // n + 1 - x // n) * n)
 
-                result.putpixel((x, y), rgb_lerp(color1, color2, t))
+                lower_line_color = rgb_lerp(left_lower_color, right_lower_color, t)
 
-            if x % n == 0:
-                y1 = y // n
-                y2 = (y // n) + 1
+                t = (y - y // n * n) / ((y // n + 1 - y // n) * n)
+                result_color = rgb_lerp(upper_line_color, lower_line_color, t)
 
-                color1 = image.getpixel((x // n, y1))
-                color2 = image.getpixel((x // n, y2))
-                t = (y - y1 * n) / ((y2 - y1) * n)
-
-                result.putpixel((x, y), rgb_lerp(color1, color2, t))
-
+                result.putpixel((x, y), result_color)
 
     return result
 
@@ -78,22 +74,15 @@ def rgb_lerp(color1, color2, t):
     return r, g, b
 
 
-
-
-
-
-
-
 def main(image_path_str):
     working_dir_path = ''
     if not os.path.isabs(image_path_str):
         working_dir_path = pathlib.Path().absolute()
     full_image_path = os.path.join(working_dir_path, image_path_str)
     image = Image.open(full_image_path)
-    #image_upsampling_closest_neighbour(image, 3).save("result.png")
-    #image_downsampling_decimation(image, 3).save("result1.png")
+    image_upsampling_closest_neighbour(image, 3).save("result.png")
+    # image_downsampling_decimation(image, 3).save("result1.png")
     image_upsampling_interpolation(image, 3).save("result1.png")
-
 
 
 if __name__ == '__main__':
