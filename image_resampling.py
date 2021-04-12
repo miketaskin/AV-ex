@@ -3,13 +3,7 @@ import pathlib
 import sys
 from PIL import Image
 
-
-def isint(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
+from validation import isint
 
 
 def image_upsampling_closest_neighbour(image, n):
